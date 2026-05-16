@@ -18,12 +18,12 @@ app.add_middleware(
 )
 
 class TravelRequest(BaseModel):
-    origin: str           # "IST"
-    destination: str      # "CDG"
-    departure_date: str   # "2025-08-01"
-    return_date: str      # "2025-08-07"
-    adults: int = 1
-    category: str         # "budget" | "mid" | "comfort"
+   from_location: str    # "Istanbul"
+   to: str              # "Paris"
+   date: str            # "2025-08-01"
+   return_date: str = "" # opsiyonel
+   passengers: int = 1
+   category: str        # "budget" | "mid" | "comfort"
 
 @app.get("/")
 def root():
@@ -33,21 +33,20 @@ def root():
 async def search(request: TravelRequest):
     try:
         flights = await search_flights(
-            request.origin,
-            request.destination,
-            request.departure_date,
-            request.return_date,
-            request.adults
+            request.from_location,
+            request.to,
+            request.date,
+            request.return_date or request.date,
+            request.passengers
         )
         hotels = await search_hotels(
-            request.destination,
-            request.departure_date,
-            request.return_date,
-            request.adults
+            request.to,
+            request.date,
+            request.return_date or request.date,
+            request.passengers
         )
         packages = await get_recommendations(flights, hotels, request.category)
         return packages
-
     except Exception as e:
         import traceback
         traceback.print_exc()
