@@ -62,6 +62,17 @@ OTEL VERİSİ:
         messages=[{"role": "user", "content": prompt}]
     )
 
-    raw = message.content[0].text
-    clean = raw.replace("```json", "").replace("```", "").strip()
-    return json.loads(clean)
+    # Tüm content bloklarına bak
+    raw = ""
+    for block in message.content:
+        if hasattr(block, 'text'):
+            raw += block.text
+
+    # JSON'u bul ve parse et
+    import re
+    json_match = re.search(r'\{.*\}', raw, re.DOTALL)
+    if json_match:
+        clean = json_match.group()
+        return json.loads(clean)
+    else:
+        raise ValueError(f"JSON bulunamadi. Raw: {raw[:500]}")

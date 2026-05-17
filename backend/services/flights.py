@@ -4,7 +4,7 @@ import os
 async def get_airport_ids(client: httpx.AsyncClient, query: str):
     headers = {
         "x-rapidapi-key": os.getenv("RAPIDAPI_KEY"),
-        "x-rapidapi-host": "sky-scrapper.p.rapidapi.com"
+        "x-rapidapi-host": "flights-sky.p.rapidapi.com"
     }
     res = await client.get(
         "https://sky-scrapper.p.rapidapi.com/api/v1/flights/searchAirport",
