@@ -1,22 +1,12 @@
-import httpx
-import os
-
 async def search_hotels(destination, check_in, check_out, adults):
-    headers = {
-        "x-rapidapi-key": os.getenv("RAPIDAPI_KEY"),
-        "x-rapidapi-host": "sky-scrapper.p.rapidapi.com"
+    return {
+        "hotels": [
+            {"name": "Ibis Budget", "stars": 2, "price_per_night": 45, "rating": 7.2},
+            {"name": "Novotel", "stars": 4, "price_per_night": 120, "rating": 8.5},
+            {"name": "Marriott", "stars": 5, "price_per_night": 280, "rating": 9.1},
+            {"name": "Holiday Inn", "stars": 3, "price_per_night": 85, "rating": 7.8},
+        ],
+        "destination": destination,
+        "check_in": check_in,
+        "check_out": check_out
     }
-    async with httpx.AsyncClient(timeout=30) as client:
-        res = await client.get(
-            "https://sky-scrapper.p.rapidapi.com/api/v1/hotels/searchHotels",
-            headers=headers,
-            params={
-                "query": destination,
-                "checkIn": check_in,
-                "checkOut": check_out,
-                "adults": adults,
-                "currency": "EUR",
-                "locale": "en-US"
-            }
-        )
-        return res.json()

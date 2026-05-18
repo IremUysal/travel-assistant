@@ -1,49 +1,12 @@
-import httpx
-import os
-
-async def get_airport_ids(client: httpx.AsyncClient, query: str):
-    headers = {
-        "x-rapidapi-key": os.getenv("RAPIDAPI_KEY"),
-        "x-rapidapi-host": "flights-sky.p.rapidapi.com"
-    }
-    res = await client.get(
-        "https://flights-sky.p.rapidapi.com/api/v1/flights/searchAirport",
-        headers=headers,
-        params={"query": query, "locale": "en-US"}
-    )
-    data = res.json()
-    print("AIRPORT API RESPONSE:", data)  # ne döndüğünü göreceğiz
-    airport = data["data"][0]
-    sky_id = airport["navigation"]["relevantFlightParams"]["skyId"]
-    entity_id = airport["navigation"]["relevantFlightParams"]["entityId"]
-    return sky_id, entity_id
-    
-
 async def search_flights(origin, destination, departure_date, return_date, adults):
-    headers = {
-        "x-rapidapi-key": os.getenv("RAPIDAPI_KEY"),
-        "x-rapidapi-host": "flights-sky.p.rapidapi.com"
+    return {
+        "itineraries": [
+            {"airline": "Turkish Airlines", "price": 189, "departure": f"{departure_date}T06:30", "arrival": f"{departure_date}T09:15", "stops": 0},
+            {"airline": "Pegasus", "price": 134, "departure": f"{departure_date}T11:00", "arrival": f"{departure_date}T13:45", "stops": 0},
+            {"airline": "Lufthansa", "price": 320, "departure": f"{departure_date}T16:00", "arrival": f"{departure_date}T19:30", "stops": 1},
+            {"airline": "Qatar Airways", "price": 450, "departure": f"{departure_date}T22:00", "arrival": f"{departure_date}T08:00", "stops": 1},
+        ],
+        "origin": origin,
+        "destination": destination,
+        "date": departure_date
     }
-    async with httpx.AsyncClient(timeout=30) as client:
-        origin_sky_id, origin_entity_id = await get_airport_ids(client, origin)
-        dest_sky_id, dest_entity_id = await get_airport_ids(client, destination)
-
-        res = await client.get(
-            "https://flights-sky.p.rapidapi.com/api/v2/flights/searchFlights",
-            headers=headers,
-            params={
-                "originSkyId": origin_sky_id,
-                "destinationSkyId": dest_sky_id,
-                "originEntityId": origin_entity_id,
-                "destinationEntityId": dest_entity_id,
-                "date": departure_date,
-                "returnDate": return_date,
-                "adults": adults,
-                "currency": "EUR",
-                "locale": "en-US",
-                "market": "TR"
-            }
-        )
-        data= res.json()
-        print("FLIGHT API RESPONSE:", str(data)[:500])  # ilk 500 karakter
-        return data
