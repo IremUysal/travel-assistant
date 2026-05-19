@@ -17,49 +17,23 @@ async def get_recommendations(flights: dict, hotels: dict, category: str):
     category_desc = CATEGORY_MAP.get(category, "en uygun seçenekleri")
 
     prompt = f"""
-Sen bir JSON tabanlı travel recommendation engine'sin.
-ÖNEMLİ KURALLAR:
-- SADECE verilen uçuş ve otel verilerini kullan
-- Yeni uçuş veya otel uydurma
-- Her pakette MUTLAKA bir flight ve bir hotel olmalı
-- Flight bilgileri MUTLAKA input flights JSON'undan seçilmeli
-- Hotel bilgileri MUTLAKA input hotels JSON'undan seçilmeli
-- Eğer veri eksikse hata mesajı döndür
-- Generic açıklamalar yazma
-- Her pakette airline, departure, arrival ve hotel name alanları dolu olmalı
-- SADECE geçerli JSON döndür
-ÖRNEK:
+Sen bir seyahat asistanısın. Aşağıdaki uçuş ve otel verilerini kullanarak kullanıcıya {category_desc} içeren 3 farklı seyahat paketi öner.
 
-Input flight:
-{
-  "airline": "Turkish Airlines",
-  "price": 189
-}
+UÇUŞ VERİSİ:
+{json.dumps(flights.get("itineraries", []), ensure_ascii=False)}
 
-Input hotel:
-{
-  "name": "Hilton Paris",
-  "price_per_night": 120
-}
+OTEL VERİSİ:
+{json.dumps(hotels.get("hotels", []), ensure_ascii=False)}
 
-Expected output:
-{
-  "flight": {
-    "airline": "Turkish Airlines",
-    "price": 189
-  },
-  "hotel": {
-    "name": "Hilton Paris",
-    "price_per_night": 120
-  }
-}
+Bu verilerden {category_desc} seç ve 3 paket oluştur. Her pakette bir uçuş ve bir otel olmalı.
 
+SADECE şu JSON formatında yanıt ver, başka hiçbir şey yazma:
 {{
   "packages": [
     {{
       "id": 1,
       "title": "Paket adı",
-      "description": "Kısa açıklama",
+      "description": "Bu paketi neden seçmeli, 1-2 cümle",
       "flight": {{
         "airline": "Havayolu adı",
         "departure": "Kalkış saati",
@@ -75,12 +49,6 @@ Expected output:
     }}
   ]
 }}
-
-UÇUŞ VERİSİ:
-{json.dumps(flights.get("itineraries", []), ensure_ascii=False)}
-
-OTEL VERİSİ:
-{json.dumps(hotels.get("hotels", []), ensure_ascii=False)}
 """
 
     message = client.messages.create(
